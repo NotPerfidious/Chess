@@ -4,6 +4,7 @@
 #include<cmath>
 #include<string>
 #include<ctime>
+#include <cstdlib>
 #include"Board.h"
 //#include<SFML/Graphics.hpp>
 
@@ -22,14 +23,13 @@ using namespace std;
 
 int main()
 {
-
 	int* fromTo = nullptr;
 	fromTo = new int[4]{ 0 }; // fromTo[0] and fromTo[1] -> current position, fromTo[2] and fromTo[3] -> destination position 
 
 	Board game1;
 	const char* colour = "White";
 	
-	while (!(game1.isKingCheckMate(colour,fromTo)) && !(game1.isDraw()) && !(game1.isStaleMate(colour,fromTo)))
+	while (!(game1.isKingCheckMate(colour, fromTo)) && !(game1.isDraw()) && !(game1.isStaleMate(colour, fromTo)))
 	{
 		setUserDisplayColour(colour);
 

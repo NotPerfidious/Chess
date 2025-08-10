@@ -39,6 +39,8 @@ public:
 
 	bool isStaleMate(const char*,int*&);
 
+	bool canAnyPieceElminateKingsEnemy(const char*, int*&);
+
 	bool isDraw();
 	//~Board();
 };

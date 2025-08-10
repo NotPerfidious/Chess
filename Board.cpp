@@ -1,8 +1,11 @@
-#include"Board.h"
+﻿#include"Board.h"
 #include"SubPieces.h"
 #include<iostream>
 #include<string>
 using namespace std;
+
+#define BOARD_ROWS 8
+#define BOARD_COLUMNS 8
 
 
 #define RESET   "\033[0m"
@@ -24,55 +27,55 @@ Board::Board()
 	
 	 const char* colour = "Black";
 
-	//Black pieces set up
-	board[0][0] = new Rook(colour);
-	board[0][7] = new Rook(colour);
+	////Black pieces set up
+	//board[0][0] = new Rook(colour);
+	//board[0][7] = new Rook(colour);
 
-	board[0][1] = new Knight(colour);
-	board[0][6] = new Knight(colour);
+	//board[0][1] = new Knight(colour);
+	//board[0][6] = new Knight(colour);
 
-	board[0][2] = new Bishop(colour);
-	board[0][5] = new Bishop(colour);
+	//board[0][2] = new Bishop(colour);
+	//board[0][5] = new Bishop(colour);
 
-	board[0][3] = new Queen(colour);
+	//board[0][3] = new Queen(colour);
 
-	board[0][4] = new King(colour);
+	//board[0][4] = new King(colour);
 
-	//White Pieces set up
-	colour = "White";
+	////White Pieces set up
+	//colour = "White";
 
-	board[7][0] = new Rook(colour);
-	board[7][7] = new Rook(colour);
+	//board[7][0] = new Rook(colour);
+	//board[7][7] = new Rook(colour);
 
-	board[7][1] = new Knight(colour);
-	board[7][6] = new Knight(colour);
+	//board[7][1] = new Knight(colour);
+	//board[7][6] = new Knight(colour);
 
-	board[7][2] = new Bishop(colour);
-	board[7][5] = new Bishop(colour);
+	//board[7][2] = new Bishop(colour);
+	//board[7][5] = new Bishop(colour);
+	//
+	//board[7][3] = new Queen(colour);
 
-	board[7][3] = new Queen(colour);
-
-	board[7][4] = new King(colour);
+	//board[7][4] = new King(colour);
 
 
-	// Pawn setup for both sides 
-	colour = "Black";
+	//// Pawn setup for both sides 
+	//colour = "Black";
 
-	for (int i = 1, j = 0; j < 8; j++)
-	{
-		board[i][j] = new Pawn(colour);
-		if (j == 7 && i == 1)
-		{
-			i = 6;
-			j = -1;
-			colour = "White";
-		}
-	}
+	//for (int i = 1, j = 0; j < 8; j++)
+	//{
+	//	board[i][j] = new Pawn(colour);
+	//	if (j == 7 && i == 1)
+	//	{
+	//		i = 6;
+	//		j = -1;
+	//		colour = "White";
+	//	}
+	//}
 
 
 
 	//code used for testing
-	/* colour = "White";
+	 colour = "White";
 	 board[5][3] = new King(colour);
 	 board[1][2] = new Pawn(colour);
 	 board[1][7] = new Rook(colour);
@@ -80,7 +83,7 @@ Board::Board()
 	 colour = "black";
 	 board[0][0] = new King(colour);
 	 board[4][3] = new Knight(colour);
-	 board[0][3] = new Rook(colour);*/
+	 board[0][3] = new Rook(colour);
 
 }
 
@@ -115,7 +118,7 @@ void Board::print()
 
 				if (cmpstr(board[i][j]->colour,"Black"))
 				{
-					cout <<CYAN<<board[i][j]->type<<RESET;
+					cout << CYAN << board[i][j]->type << RESET;
 				}
 				else
 				{
@@ -493,16 +496,52 @@ bool Board::isDraw()
 }
 
 
+bool Board:: canAnyPieceElminateKingsEnemy(const char* colour, int*& fromTo)
+{
+	//fromTo[0], fromTo[1] has the attacking piece position
+	//fromTo[2], fromTo[3] -> has the king position
+	int kingCurr_i = fromTo[2], kingCurr_j = fromTo[3];
+
+	swap(fromTo[0], fromTo[2]);
+	swap(fromTo[1], fromTo[3]);
+
+	// now fromTo[2], fromTo[3] has the attacking piece position
+
+	for(int i=0;i<BOARD_ROWS;i++)
+		for (int j = 0; j < BOARD_COLUMNS; j++)
+		{
+			if (board[i][j] != nullptr && cmpstr(colour, board[i][j]->colour) && (i != kingCurr_i || j != kingCurr_j))
+			{
+				fromTo[0] = i;
+				fromTo[1] = j;
+
+				if (board[i][j]->checkIfValidMove(fromTo, board))
+				{
+					return true;
+				}
+			}
+		}
+
+	return false;
+}
 
 
 bool Board::isKingCheckMate(const char* colour,int*&fromTo)
 {
 
+	int* temp = nullptr;
+
 	if (isKingInCheck(colour, fromTo))
 	{
-		int curr_i = fromTo[2], curr_j = fromTo[3];
-		if ((canKingMove(colour, fromTo, curr_i, curr_j)) || (anyPieceBwKingandOpp(colour,fromTo)))
+		temp = new int[4]{ fromTo[0],fromTo[1],fromTo[2],fromTo[3] };
+		cout << fromTo[0] << "," << fromTo[1] << " " << fromTo[2] << "," << fromTo[3] << endl;
+
+		int kingCurr_i = fromTo[2], kingCurr_j = fromTo[3];
+		if ((canKingMove(colour, fromTo, kingCurr_i, kingCurr_j)) || canAnyPieceElminateKingsEnemy(colour, temp)
+			|| (anyPieceBwKingandOpp(colour,fromTo)))
 			return false;
+
+		delete[] temp;
 	}
 	else
 		return false;
